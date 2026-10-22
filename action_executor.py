@@ -12,7 +12,7 @@ class ActionExecutor:
 
     @staticmethod
     def open_website(url):
-        if not url.starswith("https://"):
+        if not url.startswith("https://"):
             return f"Action refusée : l'URL doit commencer par https:// (reçu : {url})"
 
         webbrowser.open(url)
@@ -34,3 +34,13 @@ class ActionExecutor:
 
         action = self.avaible_actions[tool_name]
         return action(**tool_arguments)
+
+if __name__ == "__main__":
+    action_executor_object = ActionExecutor()
+
+    print(action_executor_object.execute_action("open_website", {"url": "https://fr.wikipedia.org"}))
+    print(action_executor_object.execute_action("search_youtube", {"search_query": "recettes de curry"}))
+
+    # Cas qui doivent être bloqués
+    print(action_executor_object.execute_action("open_website", {"url": "file:///etc/hosts"}))
+    print(action_executor_object.execute_action("delete_all_files", {}))

@@ -115,7 +115,7 @@ if __name__ == "__main__":
         text_interaction = input("\nToi : ")
         if text_interaction == "quit":
             break
-        print("Jarvis :", conversation_agent_object.ask_llm(text_interaction))
+        print("Bob :", conversation_agent_object.ask_llm(text_interaction))
 
     print("\n--- Historique complet envoyé au LLM ---")
     print(json.dumps(conversation_agent_object.conversation_history, indent=2, ensure_ascii=False))

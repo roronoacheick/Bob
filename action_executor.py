@@ -35,6 +35,44 @@ class ActionExecutor:
         action = self.avaible_actions[tool_name]
         return action(**tool_arguments)
 
+
+    @staticmethod
+    def build_tool_description(tool_name,tool_description,parameter_name,parameter_description):
+         return {
+            "type": "function",
+            "function": {
+                "name": tool_name,
+                "description": tool_description,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        parameter_name: {
+                            "type": "string",
+                            "description": parameter_description,
+                        }
+                    },
+                    "required": [parameter_name],
+                },
+            },
+        }
+
+
+    @staticmethod
+    def get_tools_description():
+        return [
+            ActionExecutor.build_tool_description(
+                tool_name="open_website",
+                tool_description="Ouvre un site web dans le navigateur. À utiliser quand l'utilisateur demande d'ouvrir un site (ex : ouvre YouTube, ouvre Wikipédia).",
+                parameter_name="url",
+                parameter_description="URL complète du site, qui commence obligatoirement par https:// (ex : https://www.youtube.com)",
+            ),
+            ActionExecutor.build_tool_description(
+                tool_name="search_youtube",
+                tool_description="Lance une recherche de vidéos sur YouTube. À utiliser quand l'utilisateur veut voir ou chercher des vidéos sur un sujet. Ne pas utiliser pour ouvrir simplement la page d'accueil de YouTube.",
+                parameter_name="search_query",
+                parameter_description="Les mots-clés à rechercher (ex : recettes de mafé)",
+            ),
+        ]
 if __name__ == "__main__":
     action_executor_object = ActionExecutor()
 

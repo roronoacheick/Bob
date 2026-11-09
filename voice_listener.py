@@ -6,14 +6,14 @@ import sounddevice as sd
 
 
 class VoiceListener:
-    def __init__(self, volume_threshold=300, silence_duration=1.0, max_waiting_duration=5.0, max_phrase_duration=15.0):
+    def __init__(self, volume_threshold=300, silence_duration=1.0, max_waiting_duration=5.0, max_phrase_duration=15.0, wake_word="Bob"):
         self.sample_rate = 16000      # 16 000 mesures par seconde, la fréquence de Whisper
         self.block_duration = 0.1     # on analyse le micro par tranches de 0,1 seconde
         self.volume_threshold = volume_threshold
         self.silence_duration = silence_duration
         self.max_waiting_duration = max_waiting_duration
         self.max_phrase_duration = max_phrase_duration
-
+        self.wake_word = wake_word.lower()
 
     @staticmethod
     def get_volume(audio_block):
@@ -67,17 +67,32 @@ class VoiceListener:
         return self.convert_to_wav(np.concatenate(phrase_blocks))
 
 
+    def extract_command(self, text_interaction):
+        # None : on ne parlait pas à Bob / "" : "Dis Bob" seul / sinon : la demande
+        if not text_interaction:
+            return None
+
+        wake_word_position = text_interaction.lower().find(self.wake_word)
+        if wake_word_position == -1:
+            return None
+
+        command = text_interaction[wake_word_position + len(self.wake_word):]
+        return command.strip(" ,.!?;:")
+
+
 
 if __name__ == "__main__":
     voice_listener_object = VoiceListener()
 
-    print("Parle quand tu veux (tu as 5 secondes pour commencer)...")
-    audio_interaction = voice_listener_object.listen_for_phrase()
+    sample_transcriptions = [
+        "Dis Bob, ouvre YouTube.",
+        "Bob mets-moi des vidéos de recettes de mafé",
+        "Dis Bob.",
+        "On mange quoi ce soir ?",
+        "Sous-titres réalisés par la communauté d'Amara.org",
+        "",
+    ]
 
-    if audio_interaction is None:
-        print("Je n'ai rien entendu.")
-    else:
-        print(f"Phrase captée : {len(audio_interaction)} octets")
-        with open("test_phrase.wav", "wb") as file:
-            file.write(audio_interaction)
-        print("Enregistrée dans test_phrase.wav")
+    for text_interaction in sample_transcriptions:
+        command = voice_listener_object.extract_command(text_interaction)
+        print(repr(text_interaction), "→", repr(command))
